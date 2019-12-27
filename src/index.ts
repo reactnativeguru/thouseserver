@@ -1,31 +1,28 @@
-import express from 'express' 
-import bodyParser from "body-parser";
+import express, { Application } from "express";
+import { ApolloServer } from "apollo-server-express";
+import { typeDefs, resolvers } from "./graphql";
+import { connectDatabase } from "./database";
 
-import { listings } from "./listings";
-
-const app = express();
 const port = 9000;
-app.use(bodyParser.json());
 
+const mount = async (app: Application) => {
+  const db = await connectDatabase();
+    // Apollo Server constructor gets called with every request so we're able to set the context based off request details if we're interested but in our case, we'll simply just pass in the db object.
+  const server = new ApolloServer({ 
+      typeDefs, 
+      resolvers,
+      context: () => ({ db })
+     });
 
-app.get("/listings", (_req, res) => {
-    res.send(listings);
-  });
+  server.applyMiddleware({ app, path: "/api" });
+  app.listen(port);
 
-app.get('/', (_req, res) => res.send('hello world'));
+  console.log(`[app]: http://localhost:${port}`);
+  const listings = await db.listings.find({}).toArray();
+  console.log(listings);
+};
+// To be able to run the connectDatabase() function the minute our server starts, we'll slightly configure how our src/index.ts file is shaped. To make things a little more apparent, we'll create a mount() function that accepts the Express app instance. We'll dictate that this mount() function will be the parent function to run to essentially start our Node Express server.
 
-app.post("/delete-listing", (req, res) => {
-    const id: string = req.body.id;
-  
-    for (let i = 0; i < listings.length; i++) {
-      if (listings[i].id === id) {
-        return res.send(listings.splice(i, 1)[0]);
-      }
-    }
-  
-    return res.send("failed to deleted listing");
-  });
-
-app.listen(port);
+mount(express());
 
 console.log(`[app] : http://localhost:${port}`);
