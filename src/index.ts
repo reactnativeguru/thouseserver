@@ -18,8 +18,8 @@ const mount = async (app: Application) => {
   app.listen(port);
 
   console.log(`[app]: http://localhost:${port}`);
-  const listings = await db.listings.find({}).toArray();
-  console.log(listings);
+//   const listings = await db.listings.find({}).toArray();
+//   console.log(listings);
 };
 // To be able to run the connectDatabase() function the minute our server starts, we'll slightly configure how our src/index.ts file is shaped. To make things a little more apparent, we'll create a mount() function that accepts the Express app instance. We'll dictate that this mount() function will be the parent function to run to essentially start our Node Express server.
 

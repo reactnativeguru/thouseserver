@@ -1,11 +1,12 @@
 import { MongoClient } from "mongodb";
+import { Database } from "../lib/types";
 
 const user = "user";
 const userPassword = "user";
 const cluster = "cluster0-dor62.mongodb.net/test?retryWrites=true&w=majority";
 const url = `mongodb+srv://${user}:${userPassword}@${cluster}`
 
-export const connectDatabase = async () => {
+export const connectDatabase = async (): Promise<Database> => {
     const client = await MongoClient.connect(
         url,
         {
